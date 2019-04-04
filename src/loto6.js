@@ -2,7 +2,7 @@ const axios = require('axios');
 const jsdom = require('jsdom');
 const {JSDOM} = jsdom;
 
-const url = 'http://www.takarakujinet.co.jp/ajax/loto7/pastResultPage.do';
+const url = 'http://www.takarakujinet.co.jp/ajax/loto6/pastResultPage.do';
 const conf = {
   responseType: 'document',
 };
@@ -17,13 +17,13 @@ const parse = (data) => {
   while(th = kekkaBody.querySelector('tr > th')) {
     kekkaBody.removeChild(th.parentNode);
   };
-  const rows = kekkaBody.querySelectorAll('tr:nth-child(4n+1)');
+  const rows = kekkaBody.querySelectorAll('tr:nth-child(3n+1)');
   rows.forEach((row) => {
     const rowData = {};
     const matches1 = row.children[0].textContent
         .match(/第([0-9]+)回([0-9]{4})([0-9]{2})\/([0-9]{2})/);
-    const matches2 = row.children[1].textContent
-        .match(/(([0-9]{2}\s?){7})\(([0-9]{2})\)\s\(([0-9]{2})\)/);
+    const matches2 = row.children[1].innerHTML
+        .replace(/<br>/g, ' ').match(/(([0-9]{2}\s?){6})\s\(([0-9]{2})\)/);
     rowData.stage = +matches1[1];
     rowData.date = new Date(`${matches1[2]}/${matches1[3]}/${matches1[4]}`);
     rowData.main_nums = [];
@@ -32,7 +32,6 @@ const parse = (data) => {
       rowData.main_nums.push(+num);
     });
     rowData.bonus_num1 = +matches2[3];
-    rowData.bonus_num2 = +matches2[4];
     res.push(rowData);
   });
 
